@@ -1,0 +1,541 @@
+/* public/css/styles.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h1 {
+  color: #1e293b;
+  border-bottom: 3px solid #3b82f6;
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+.btn {
+  background: #3b82f6;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #2563eb;
+}
+
+.btn-danger {
+  background: #ef4444;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+/* Session Cards */
+.session-card {
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+
+.session-card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.session-type {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.session-details p {
+  margin: 8px 0;
+  color: #475569;
+}
+
+.session-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 30px;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 12px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.close {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.close:hover {
+  color: #000;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Individual Time Modal */
+.time-modal-content {
+  margin: 20px 0;
+}
+
+.time-modal-content p {
+  background: #f1f5f9;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  color: #475569;
+}
+
+.time-modal-content .form-group {
+  margin-bottom: 15px;
+}
+
+.time-modal-content label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.time-modal-content input[type="time"],
+.time-modal-content input[type="number"],
+.time-modal-content textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.time-modal-content textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Status-spezifische Farben für Zeitanzeige */
+.student-row.status-late {
+  background-color: #fef3c7;
+}
+
+.student-row.status-partial {
+  background-color: #fce7f3;
+}
+
+.status-partial {
+  background: #fce7f3;
+  color: #831843;
+}
+
+/* Studenten-Dashboard */
+.stats-dashboard {
+  padding: 20px 0;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-section {
+  background: #f8fafc;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.progress-section h3 {
+  margin-bottom: 15px;
+  color: #1e293b;
+}
+
+.progress-bar {
+  background: #e2e8f0;
+  height: 30px;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  transition: width 0.5s ease;
+}
+
+.progress-label {
+  text-align: center;
+  color: #475569;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.sessions-section {
+  margin-top: 30px;
+}
+
+.sessions-section h3 {
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.sessions-table thead {
+  background: #1e293b;
+  color: white;
+}
+
+.sessions-table th,
+.sessions-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.session-row.status-present {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.session-row.status-late {
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.session-row.status-absent {
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.session-row.status-not_attended {
+  opacity: 0.6;
+}
+
+/* ============================================================================
+   MOBILE OPTIMIERUNG
+   ============================================================================ */
+
+/* Basis - Mobile First */
+@media screen and (max-width: 768px) {
+  /* Container */
+  .container {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  /* Überschriften */
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    margin: 10px 0;
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* Forms */
+  .form-group {
+    margin: 15px 0;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px; /* Verhindert Auto-Zoom auf iOS */
+  }
+
+  /* Tabellen - Horizontal Scrollbar */
+  .attendance-table,
+  .sessions-table,
+  .matrix-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .attendance-table th,
+  .attendance-table td,
+  .sessions-table th,
+  .sessions-table td {
+    padding: 8px 4px;
+    font-size: 13px;
+  }
+
+  /* Session Cards - Stack auf Mobile */
+  .session-card {
+    margin-bottom: 15px;
+  }
+
+  .session-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .session-actions .btn {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* Stats Cards - Stack auf Mobile */
+  .stats-cards {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+  }
+
+  /* Modal - Full Screen auf Mobile */
+  .modal-content {
+    width: 95%;
+    margin: 5% auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* Time Controls - Stack */
+  .time-controls .form-group {
+    display: block;
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  /* QR Code Modal */
+  #qr-modal .modal-content {
+    padding: 20px;
+  }
+
+  /* Kurs-Übersicht Matrix */
+  .matrix-table {
+    font-size: 12px;
+  }
+
+  .matrix-table th,
+  .matrix-table td {
+    padding: 6px 4px;
+  }
+
+  .matrix-table th:first-child,
+  .matrix-table td:first-child {
+    min-width: 120px;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Navigation - Zurück-Link größer */
+  a {
+    font-size: 16px;
+    padding: 10px 0;
+    display: inline-block;
+  }
+}
+
+/* Tablet (768px - 1024px) */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    padding: 25px;
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .btn {
+    font-size: 15px;
+  }
+}
+
+/* Touch-Optimierung */
+@media (hover: none) and (pointer: coarse) {
+  /* Größere Touch-Targets */
+  button,
+  .btn,
+  a,
+  select {
+    min-height: 44px; /* Apple's empfohlene Touch-Größe */
+  }
+
+  /* Größere Checkboxen */
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Größere Dropdown-Icons */
+  select {
+    padding-right: 35px;
+  }
+
+  /* Swipe-freundliche Tabellen */
+  .attendance-table,
+  .sessions-table,
+  .matrix-table {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Landscape Mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .btn,
+  .modal,
+  .form-group,
+  nav {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .matrix-table,
+  .attendance-table,
+  .sessions-table {
+    page-break-inside: avoid;
+  }
+}

@@ -1,11 +1,22 @@
-import { Provider } from 'ltijs';
+const { Provider } = require('ltijs');
 
-// LTI-Provider initialisieren
-export const lti = new Provider(process.env.LTI_KEY);
+const lti = new Provider(
+  process.env.LTI_KEY,
+  {
+    url: process.env.LTI_DB
+  }
+);
 
-// Einrichtung des LTI-Providers
-await lti.setup(process.env.LTI_DB, {
-  appRoute: '/lti',
-  loginRoute: '/login',
-  keysetRoute: '/keys'
-});
+// LTI initialisieren und an Express hängen
+function setupLTI(app) {
+  lti.deploy({ app, server: false });
+
+  lti.onConnect((token, req, res) => {
+    res.send(`
+      <h1>🎉 LTI Launch erfolgreich</h1>
+      <p>Dieses Tool wurde von Canvas gestartet.</p>
+    `);
+  });
+}
+
+module.exports = setupLTI;

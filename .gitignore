@@ -1,3 +1,381 @@
-node_modules/
+# ============================================================================
+# SK Attendance LTI Tool - Git Ignore File
+# ============================================================================
+#
+# This file tells Git which files and directories to ignore.
+# These files should never be committed to version control.
+#
+# ============================================================================
+
+# ============================================================================
+# ENVIRONMENT & SECRETS (CRITICAL - NEVER COMMIT!)
+# ============================================================================
+
+# Environment configuration files (contain sensitive data)
 .env
+.env.local
+.env.production
+.env.development
+.env.test
+*.env
+
+# Backup environment files
+.env.backup
+.env.old
+.env.save
+
+# ============================================================================
+# NODE.JS & NPM
+# ============================================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package manager lock files (optional - team decision)
+# Uncomment if you want to ignore lock files:
+# package-lock.json
+# yarn.lock
+
+# npm cache
+.npm
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# ============================================================================
+# LOGS
+# ============================================================================
+
+# Application logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# PM2 logs
+.pm2/
+pm2-*.log
+
+# Log files
+*.log.*
+*.log.gz
+
+# Combined log files
+combined.log
+error.log
+access.log
+out.log
+err.log
+
+# ============================================================================
+# DATABASE
+# ============================================================================
+
+# Database backups
+backups/
+*.sql
+*.sql.gz
+*.dump
+*.backup
+
+# Database files (if using SQLite for development)
+*.db
+*.sqlite
+*.sqlite3
+
+# PostgreSQL dumps
+*.pgdump
+
+# ============================================================================
+# UPLOADS & USER DATA
+# ============================================================================
+
+# Uploaded files (excuse documents, attachments)
+uploads/
+uploads/*
+!uploads/.gitkeep
+
+# Generated files
+generated/
+temp/
+tmp/
+
+# User data exports
+exports/
+downloads/
+
+# ============================================================================
+# GENERATED DOCUMENTATION
+# ============================================================================
+
+# Generated API documentation
+api-docs/
+docs/generated/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# ============================================================================
+# DEVELOPMENT TOOLS
+# ============================================================================
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# WebStorm
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# OPERATING SYSTEM FILES
+# ============================================================================
+
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# CLOUDFLARE TUNNEL
+# ============================================================================
+
+# Cloudflare tunnel credentials
+.cloudflared/
+cloudflared.yml
+
+# Tunnel JSON files (contain credentials)
+*.tunnel.json
+
+# ============================================================================
+# SSL CERTIFICATES & KEYS
+# ============================================================================
+
+# Private keys and certificates
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Let's Encrypt
+certbot/
+letsencrypt/
+
+# ============================================================================
+# BUILD & DISTRIBUTION
+# ============================================================================
+
+# Build output
+dist/
+build/
+out/
+
+# Compiled binary addons
+build/Release
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Webpack
+.webpack/
+
+# Parcel cache
+.cache/
+.parcel-cache/
+
+# ============================================================================
+# TESTING
+# ============================================================================
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Jest
+jest-results.json
+
+# Playwright
+test-results/
+playwright-report/
+
+# ============================================================================
+# DOCKER (if used in future)
+# ============================================================================
+
+# Docker files (optional)
+# docker-compose.override.yml
+# Dockerfile.local
+
+# ============================================================================
+# TEMPORARY FILES
+# ============================================================================
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+
+# Cache directories
+.cache/
+cache/
+
+# ============================================================================
+# SECURITY SCANNING (if used)
+# ============================================================================
+
+# Snyk
+.snyk
+
+# SonarQube
+.sonarqube/
+.scannerwork/
+
+# ============================================================================
+# MISC
+# ============================================================================
+
+# Debug files
+debug/
+*.debug
+
+# Local configuration overrides
+local.config.js
+local.settings.json
+
+# Benchmark results
+benchmark-results.json
+
+# Redis dump
+dump.rdb
+
+# Process IDs
+*.pid
+pids/
+
+# Session files
+sessions/
+
+# ============================================================================
+# PROJECT-SPECIFIC
+# ============================================================================
+
+# Old/deprecated files
+DEPRECATED/
+old/
+archive/
+
+# Private notes
+NOTES.md
+TODO.private.md
+scratch/
+
+# Local scripts (optional - uncomment if needed)
+# scripts/local/
+
+# ============================================================================
+# EXCEPTIONS (FILES TO KEEP)
+# ============================================================================
+
+# Keep example files
+!.env.example
+!config.example.js
+
+# Keep README files in otherwise empty directories
+!**/README.md
+!**/.gitkeep
+
+# Keep essential configuration
+!.gitignore
+!.npmrc
+!.nvmrc
+
+# ============================================================================
+# END OF .gitignore
+# ============================================================================
+
+# Questions about what to ignore?
+# See: https://git-scm.com/docs/gitignore
+# Or check: https://github.com/github/gitignore
