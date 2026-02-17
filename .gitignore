@@ -379,3 +379,13 @@ scratch/
 # Questions about what to ignore?
 # See: https://git-scm.com/docs/gitignore
 # Or check: https://github.com/github/gitignore
+
+# BAföG Test Files
+test-*.js
+*_TEST.pdf
+*_ANALYZE.pdf
+*_FELDTEST.pdf
+*_ALLE*.pdf
+analyze-fields.js
+extract-fields.js
+show-field-properties.js
