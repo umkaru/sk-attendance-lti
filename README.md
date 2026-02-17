@@ -484,7 +484,7 @@ This is an internal project. For external developers interested in contributing:
 
 For issues, questions, or feature requests:
 
-- **Email:** 
+- **Email:** neumannsrb@gmail.com
 - **GitHub Issues:** https://github.com/umkaru/sk-attendance-lti/issues
 
 ---
@@ -496,7 +496,7 @@ Built with assistance from Claude (Anthropic) for:
 - Bug fixing and optimization
 - Documentation and deployment guidance
 
-Developed to modernize attendance tracking for Canvas LMS courses with BAföG compliance requirements.
+Developed for **Süddeutsche Karriere (SK)** to modernize attendance tracking for Canvas LMS courses with BAföG compliance requirements.
 
 ---
 
