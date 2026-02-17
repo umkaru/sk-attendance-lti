@@ -172,8 +172,17 @@ function generateKeyPair() {
 const sessionsRouter = require('./routes/sessions');
 app.use('/api', sessionsRouter);
 
+// Routes registrieren
 const attendanceRouter = require('./routes/attendance');
 app.use('/api', attendanceRouter);
+
+// BAföG Routes
+const bafoegRoutes = require('./routes/bafoeg');
+app.use('/api/bafoeg', bafoegRoutes);
+
+// Student Profile Routes
+const studentProfileRoutes = require('./routes/student-profile');
+app.use('/api/student', studentProfileRoutes);
 
 // ============================================================================
 // LTI 1.3 ENDPOINTS
@@ -289,22 +298,34 @@ app.post('/lti/launch', async (req, res) => {
       custom: payload['https://purl.imsglobal.org/spec/lti/claim/custom'] || {}
     };
 
-    console.log('🔍 LTI Claims:', JSON.stringify(ltiClaims, null, 2));
+    // Speichere in Session ZUERST
+req.session.ltiClaims = ltiClaims;
+req.session.isAuthenticated = true;
 
-    req.session.ltiClaims = ltiClaims;
-    req.session.isAuthenticated = true;
+// Debug: Zeige ALLE LTI Claims (JETZT verfügbar!)
+console.log('🔍 RAW LTI PAYLOAD (vollständig):', JSON.stringify(payload, null, 2));
 
-    await new Promise((resolve, reject) => {
-      req.session.save((err) => {
-        if (err) {
-          console.error('❌ Session Save Error:', err);
-          reject(err);
-        } else {
-          console.log('✅ Session gespeichert in DB');
-          resolve();
-        }
-      });
-    });
+// Original Log (für Übersicht)
+console.log('🔍 LTI Claims:', JSON.stringify({
+  userId: ltiClaims.userId,
+  userName: ltiClaims.userName,
+  userEmail: ltiClaims.userEmail,
+  roles: ltiClaims.roles,
+  context: ltiClaims.context,
+  custom: ltiClaims.custom
+}, null, 2));
+
+await new Promise((resolve, reject) => {
+  req.session.save((err) => {
+    if (err) {
+      console.error('❌ Session Save Error:', err);
+      reject(err);
+    } else {
+      console.log('✅ Session gespeichert in DB');
+      resolve();
+    }
+  });
+});
 
     console.log('🔍 Session nach Speichern:', {
       isAuthenticated: req.session.isAuthenticated,
@@ -684,32 +705,32 @@ async function syncCourseEnrollments(canvasCourseId) {
     console.log(`📋 ${enrollments.length} aktive Studenten gefunden in Canvas`);
 
     // Upsert jeden Student in die DB
-    let syncedCount = 0;
-    for (const enrollment of enrollments) {
-      const user = enrollment.user;
-      
-      const upsertQuery = `
-        INSERT INTO users (canvas_user_id, name, email, role, created_at, updated_at)
-        VALUES ($1, $2, $3, 'student', NOW(), NOW())
-        ON CONFLICT (canvas_user_id) 
-        DO UPDATE SET 
-          name = EXCLUDED.name,
-          email = EXCLUDED.email,
-          updated_at = NOW()
-        RETURNING id
-      `;
+let syncedCount = 0;
+for (const enrollment of enrollments) {
+  const user = enrollment.user;
+  
+  const upsertQuery = `
+    INSERT INTO users (canvas_user_id, name, email, role, created_at, updated_at)
+    VALUES ($1, $2, $3, 'student', NOW(), NOW())
+    ON CONFLICT (canvas_user_id) 
+    DO UPDATE SET 
+      name = EXCLUDED.name,
+      email = EXCLUDED.email,
+      updated_at = NOW()
+    RETURNING id
+  `;
 
-      // Nutze die UUID aus user.sis_user_id oder user.integration_id
-const userUUID = user.sis_user_id || user.integration_id || String(user.id);
+  // Benutze LOGIN_ID (SK_lerner01) statt UUID oder numeric ID
+  const canvasUserId = user.login_id || user.sis_user_id || user.integration_id || String(user.id);
 
-await pool.query(upsertQuery, [
-  userUUID,
-  user.name,
-  user.login_id || user.email || ''
-]);
-      
-      syncedCount++;
-    }
+  await pool.query(upsertQuery, [
+    canvasUserId,  // ✅ Priorisiert login_id (SK_lerner01)
+    user.name,
+    user.email || user.login_id || ''
+  ]);
+
+  syncedCount++;
+}
 
     console.log(`✅ ${syncedCount} Enrollments synchronisiert`);
     return syncedCount;
@@ -1198,12 +1219,219 @@ function renderStudentView(claims, sessionId) {
         <p><strong>Hallo:</strong> ${claims.userName}</p>
         <p><strong>Kurs:</strong> ${courseName}</p>
         <div style="margin: 20px 0;">
-  <a href="/api/bafog-pdf/${courseId}?sid=${sessionId}" 
-     class="btn" 
-     style="display: inline-block; text-decoration: none; background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600;">
-    📄 BAföG-Bescheinigung herunterladen
-  </a>
+  <div style="display: flex; gap: 10px; margin-top: 10px;">
+  <a href="/api/attendance/bafoeg-pdf/${courseId}?sid=${sessionId}" 
+   class="btn" style="flex: 1;">
+  📄 BAföG Bescheinigung (einfach)
+</a>
+  
+  <a href="/api/bafoeg/formblatt-f/${courseId}?sid=${sessionId}" 
+   class="btn" style="flex: 1;">
+  📋 Formblatt F (offiziell)
+</a>
 </div>
+</div>
+
+<!-- Student Profil-Formular für BAföG Daten -->
+
+<div style="margin: 30px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+  <h2 style="margin-top: 0;">📋 Persönliche Daten für BAföG</h2>
+  <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">
+    Diese Daten werden für das offizielle BAföG Formblatt F benötigt.
+    Felder mit * sind Pflichtfelder.
+  </p>
+  
+  <form id="profile-form" style="background: #f9fafb; padding: 20px; border-radius: 8px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      
+      <!-- Familienname -->
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+          Familienname *
+        </label>
+        <input 
+          type="text" 
+          id="familienname" 
+          name="familienname"
+          required
+          maxlength="100"
+          style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+      </div>
+      
+      <!-- Vorname -->
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+          Vorname(n) *
+        </label>
+        <input 
+          type="text" 
+          id="vorname" 
+          name="vorname"
+          required
+          maxlength="100"
+          style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+      </div>
+      
+      <!-- Geburtsdatum -->
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+          Geburtsdatum *
+        </label>
+        <input 
+          type="date" 
+          id="geburtsdatum" 
+          name="geburtsdatum"
+          required
+          style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+      </div>
+      
+      <!-- Straße & Hausnummer -->
+      <div style="grid-column: span 2; display: grid; grid-template-columns: 3fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+            Straße
+          </label>
+          <input 
+            type="text" 
+            id="strasse" 
+            name="strasse"
+            maxlength="100"
+            placeholder="Musterstraße"
+            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+            Hausnr.
+          </label>
+          <input 
+            type="text" 
+            id="hausnummer" 
+            name="hausnummer"
+            maxlength="10"
+            placeholder="42"
+            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+        </div>
+      </div>
+      
+      <!-- PLZ -->
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+          Postleitzahl
+        </label>
+        <input 
+          type="text" 
+          id="plz" 
+          name="plz"
+          pattern="[0-9]{5}"
+          maxlength="5"
+          placeholder="12345"
+          style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+      </div>
+      
+      <!-- Wohnort -->
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+          Wohnort
+        </label>
+        <input 
+          type="text" 
+          id="wohnort" 
+          name="wohnort"
+          maxlength="100"
+          placeholder="Berlin"
+          style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+      </div>
+      
+    </div>
+    
+    <!-- Submit Button -->
+    <div style="margin-top: 20px; display: flex; align-items: center; gap: 15px;">
+      <button 
+        type="submit" 
+        class="btn" 
+        style="background-color: #10b981; color: white; padding: 12px 24px; border: none; cursor: pointer; font-weight: 500;">
+        💾 Daten speichern
+      </button>
+      <span id="save-status" style="font-size: 14px;"></span>
+    </div>
+  </form>
+</div>
+
+<script>
+(function() {
+  const sessionId = '${sessionId}';
+  
+  // Lade Profildaten beim Start
+  async function loadProfile() {
+    try {
+      const res = await fetch('/api/student/profile?sid=' + sessionId);
+      const data = await res.json();
+      
+      if (data.success && data.profile) {
+        const p = data.profile;
+        document.getElementById('familienname').value = p.familienname || '';
+        document.getElementById('vorname').value = p.vorname || '';
+        document.getElementById('geburtsdatum').value = p.geburtsdatum || '';
+        document.getElementById('strasse').value = p.strasse || '';
+        document.getElementById('hausnummer').value = p.hausnummer || '';
+        document.getElementById('plz').value = p.plz || '';
+        document.getElementById('wohnort').value = p.wohnort || '';
+        console.log('✅ Profil geladen');
+      }
+    } catch (err) {
+      console.error('❌ Error loading profile:', err);
+    }
+  }
+  
+  // Speichere Profil beim Submit
+  document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      familienname: document.getElementById('familienname').value.trim(),
+      vorname: document.getElementById('vorname').value.trim(),
+      geburtsdatum: document.getElementById('geburtsdatum').value,
+      strasse: document.getElementById('strasse').value.trim(),
+      hausnummer: document.getElementById('hausnummer').value.trim(),
+      plz: document.getElementById('plz').value.trim(),
+      wohnort: document.getElementById('wohnort').value.trim()
+    };
+    
+    const statusEl = document.getElementById('save-status');
+    statusEl.textContent = '💾 Speichere...';
+    statusEl.style.color = '#6b7280';
+    
+    try {
+      const res = await fetch('/api/student/profile?sid=' + sessionId, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        statusEl.textContent = '✅ Erfolgreich gespeichert!';
+        statusEl.style.color = '#10b981';
+        setTimeout(() => { statusEl.textContent = ''; }, 3000);
+      } else {
+        const errorMsg = data.errors ? data.errors.join(', ') : data.error;
+        statusEl.textContent = '❌ Fehler: ' + errorMsg;
+        statusEl.style.color = '#ef4444';
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      statusEl.textContent = '❌ Fehler beim Speichern';
+      statusEl.style.color = '#ef4444';
+    }
+  });
+  
+  // Lade Profil beim Seitenaufruf
+  loadProfile();
+})();
+</script>
+
 
         <div id="stats-container">
           <div style="text-align: center; padding: 40px;">
