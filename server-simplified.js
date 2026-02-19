@@ -289,8 +289,11 @@ app.post('/lti/launch', async (req, res) => {
     console.log('✅ Token verifiziert');
 
     // Extrahiere LTI Claims
-    const ltiClaims = {
-      userId: payload.sub,
+  const ltiClaims = {
+      userId: payload['https://purl.imsglobal.org/spec/lti/claim/custom']?.canvas_user_login_id || 
+        payload['https://purl.imsglobal.org/spec/lti/claim/lis']?.person_sourcedid ||
+        (payload['https://purl.imsglobal.org/spec/lti/claim/custom']?.canvas_user_sis_id || '').replace('SK_', '') ||
+        payload.sub, // Fallback zu UUID
       userName: payload.name || 'User',
       userEmail: payload.email,
       roles: payload['https://purl.imsglobal.org/spec/lti/claim/roles'] || [],
@@ -720,8 +723,11 @@ for (const enrollment of enrollments) {
     RETURNING id
   `;
 
-  // Benutze LOGIN_ID (SK_lerner01) statt UUID oder numeric ID
-  const canvasUserId = user.login_id || user.sis_user_id || user.integration_id || String(user.id);
+  // Normalisiere SIS IDs: SK_lerner01 → lerner01
+let canvasUserId = user.login_id || user.sis_user_id || user.integration_id || String(user.id);
+if (canvasUserId.startsWith('SK_')) {
+  canvasUserId = canvasUserId.replace('SK_', '');
+}
 
   await pool.query(upsertQuery, [
     canvasUserId,  // ✅ Priorisiert login_id (SK_lerner01)

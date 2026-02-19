@@ -1510,7 +1510,7 @@ if (courseResult.rows.length === 0) {
     `;
     const sessionsResult = await pool.query(sessionsQuery, [course.id]);
 
-// Hole ALLE Studenten (auch ohne Anwesenheit) - aber entferne Duplikate
+// Hole nur Studenten die in DIESEM Kurs Attendance haben
 const studentsQuery = `
   SELECT DISTINCT ON (u.canvas_user_id)
     u.id, 
@@ -1519,10 +1519,16 @@ const studentsQuery = `
     u.email
   FROM users u
   WHERE u.role = 'student' 
-  AND u.canvas_user_id NOT LIKE 'checkin_%'
+    AND u.canvas_user_id NOT LIKE 'checkin_%'
+    AND EXISTS (
+      SELECT 1 FROM attendance_records ar
+      JOIN sessions s ON ar.session_id = s.id
+      WHERE ar.canvas_user_id = u.canvas_user_id
+        AND s.course_id = $1
+    )
   ORDER BY u.canvas_user_id, u.created_at DESC
 `;
-const studentsResult = await pool.query(studentsQuery);
+const studentsResult = await pool.query(studentsQuery, [course.id]);
 
     // Hole alle Anwesenheitsdaten
     const attendanceQuery = `

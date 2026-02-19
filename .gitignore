@@ -91,6 +91,7 @@ err.log
 # Database backups
 backups/
 *.sql
+!migrations/*.sql
 *.sql.gz
 *.dump
 *.backup
